@@ -29,8 +29,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 ])]
 class Ticket extends Model
 {
-    use HasFactory;
-
     protected $casts = [
         'priority'           => TicketSlaPriority::class,
         'status'             => TicketStatus::class,
@@ -41,6 +39,7 @@ class Ticket extends Model
         'overdue_at'         => 'datetime',
     ];
 
+    /** @return HasMany<TicketMessage, $this> */
     public function messages(): HasMany
     {
         return $this->hasMany(TicketMessage::class);

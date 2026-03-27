@@ -9,6 +9,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketMessageService
 {
+    /**
+     * @return LengthAwarePaginator<int, TicketMessage>
+     */
     public function paginateForAgent(Ticket $ticket): LengthAwarePaginator
     {
         return $ticket->messages()->with(['user' => function ($q) {
@@ -16,6 +19,9 @@ class TicketMessageService
         }])->latest('id')->paginate();
     }
 
+    /**
+     * @return LengthAwarePaginator<int, TicketMessage>
+     */
     public function paginateForClient(Ticket $ticket): LengthAwarePaginator
     {
         return $ticket->messages()->with(['user' => function ($q) {
@@ -28,6 +34,7 @@ class TicketMessageService
 
     public function storeForAgent(Ticket $ticket, User $user, string $content, bool $isInternal): TicketMessage
     {
+        /** @var TicketMessage $message */
         $message = $ticket->messages()->create([
             'user_id'     => $user->id,
             'content'     => $content,
@@ -41,6 +48,7 @@ class TicketMessageService
 
     public function storeForClient(Ticket $ticket, User $user, string $content): TicketMessage
     {
+        /** @var TicketMessage $message */
         $message = $ticket->messages()->create([
             'user_id'     => $user->id,
             'content'     => $content,

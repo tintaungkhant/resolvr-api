@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AgentAuthService
 {
+    /**
+     * @return array{token: string}|null
+     */
     public function login(string $email, string $password): ?array
     {
         $profile = Agent::where('email', $email)->first();
@@ -16,6 +19,10 @@ class AgentAuthService
         }
 
         $user = $profile->user;
+
+        if (! $user) {
+            return null;
+        }
 
         return [
             'token' => $user->createToken('auth_token', ['role:'.$user->role->value])->plainTextToken,

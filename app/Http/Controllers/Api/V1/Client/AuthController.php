@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use Illuminate\Http\JsonResponse;
 use App\Services\ClientAuthService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Client\LoginRequest;
@@ -12,7 +13,7 @@ class AuthController extends Controller
         private ClientAuthService $clientAuthService,
     ) {}
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $payload = $this->clientAuthService->login(
             $request->validated('email'),

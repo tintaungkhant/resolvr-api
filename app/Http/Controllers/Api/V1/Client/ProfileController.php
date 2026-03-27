@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\ClientProfileService;
 use App\Http\Resources\Api\V1\ProfileResource;
@@ -13,9 +14,12 @@ class ProfileController extends Controller
         private ClientProfileService $clientProfileService,
     ) {}
 
-    public function show(Request $request)
+    public function show(Request $request): JsonResponse
     {
-        $profile = $this->clientProfileService->forUser($request->user());
+        $user = $request->user();
+        abort_if($user === null, 401);
+
+        $profile = $this->clientProfileService->forUser($user);
 
         return successResponse(ProfileResource::make($profile));
     }

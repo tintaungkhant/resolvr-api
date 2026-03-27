@@ -7,7 +7,7 @@ use App\Models\Agent;
 
 class AgentProfileService
 {
-    public function forUser(User $user): Agent
+    public function forUser(User $user): ?Agent
     {
         return $user->agent;
     }

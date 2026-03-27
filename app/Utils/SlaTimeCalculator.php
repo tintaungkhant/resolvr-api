@@ -12,11 +12,11 @@ class SlaTimeCalculator
     public static function calcConsumedTime(Ticket $ticket): int
     {
         $totalPausedTime = $ticket->sla_paused_time;
-        if ($ticket->status === TicketStatus::OnHold) {
+        if ($ticket->status === TicketStatus::OnHold && $ticket->last_sla_paused_at !== null) {
             $totalPausedTime += $ticket->last_sla_paused_at->diffInSeconds(now());
         }
 
-        $totalDuration = $ticket->created_at->diffInSeconds(now());
+        $totalDuration = $ticket->created_at !== null ? $ticket->created_at->diffInSeconds(now()) : 0;
 
         $totalConsumedTime = $totalDuration - $totalPausedTime;
 
@@ -51,9 +51,11 @@ class SlaTimeCalculator
 
     public static function calcDueAt(Ticket $ticket): Carbon
     {
-        $dueAt = $ticket->created_at->copy()->addSeconds($ticket->sla_resolution_time + $ticket->sla_paused_time);
+        /** @var Carbon $createdAt */
+        $createdAt = $ticket->created_at;
+        $dueAt = $createdAt->copy()->addSeconds($ticket->sla_resolution_time + $ticket->sla_paused_time);
 
-        if ($ticket->status === TicketStatus::OnHold && $ticket->last_sla_paused_at) {
+        if ($ticket->status === TicketStatus::OnHold && $ticket->last_sla_paused_at !== null) {
             $currentHoldDuration = $ticket->last_sla_paused_at->diffInSeconds(now());
             $dueAt->addSeconds($currentHoldDuration);
         }

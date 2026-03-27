@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Models\Ticket;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\TicketMessageService;
 use App\Http\Resources\Api\V1\TicketMessageResource;
@@ -14,18 +15,21 @@ class TicketMessageController extends Controller
         private TicketMessageService $ticketMessageService,
     ) {}
 
-    public function index(Ticket $ticket)
+    public function index(Ticket $ticket): JsonResponse
     {
         $messages = $this->ticketMessageService->paginateForClient($ticket);
 
         return successResponse(TicketMessageResource::collection($messages));
     }
 
-    public function store(Ticket $ticket, TicketMessageStoreRequest $request)
+    public function store(Ticket $ticket, TicketMessageStoreRequest $request): JsonResponse
     {
+        $user = $request->user();
+        abort_if($user === null, 401);
+
         $message = $this->ticketMessageService->storeForClient(
             $ticket,
-            $request->user(),
+            $user,
             $request->validated('content'),
         );
 

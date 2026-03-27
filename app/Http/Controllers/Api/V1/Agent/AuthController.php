@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Agent;
 
+use Illuminate\Http\JsonResponse;
 use App\Services\AgentAuthService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Agent\LoginRequest;
@@ -12,7 +13,7 @@ class AuthController extends Controller
         private AgentAuthService $agentAuthService,
     ) {}
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $payload = $this->agentAuthService->login(
             $request->validated('email'),

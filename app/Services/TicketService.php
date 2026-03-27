@@ -14,31 +14,43 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketService
 {
+    /**
+     * @return LengthAwarePaginator<int, Ticket>
+     */
     public function paginateForAgent(User $user, string $type): LengthAwarePaginator
     {
         if ($type === 'mine') {
-            return Ticket::where('assignee_id', $user->agent->id)->latest('id')->paginate();
+            $agent = $user->agent;
+
+            return Ticket::where('assignee_id', $agent?->id)->latest('id')->paginate();
         }
 
         return Ticket::latest('id')->paginate();
     }
 
+    /**
+     * @return LengthAwarePaginator<int, Ticket>
+     */
     public function paginateForClient(User $user, string $type): LengthAwarePaginator
     {
         if ($type === 'mine') {
             return Ticket::where('issuer_id', $user->id)->latest('id')->paginate();
         }
 
-        return Ticket::where('organization_id', $user->client->organization_id)->latest('id')->paginate();
+        $client = $user->client;
+
+        return Ticket::where('organization_id', $client?->organization_id)->latest('id')->paginate();
     }
 
     public function createForClient(User $user, string $title, string $description, TicketSlaPriority $priority): Ticket
     {
         $slaResolutionTime = SlaTimeGenerator::generate($priority);
+        $client = $user->client;
+        $organizationId = $client?->organization_id;
 
-        return DB::transaction(function () use ($user, $title, $description, $priority, $slaResolutionTime) {
+        return DB::transaction(function () use ($user, $title, $description, $priority, $slaResolutionTime, $organizationId) {
             $ticket = Ticket::create([
-                'organization_id'     => $user->client->organization_id,
+                'organization_id'     => $organizationId,
                 'issuer_id'           => $user->id,
                 'title'               => $title,
                 'description'         => $description,
@@ -98,8 +110,9 @@ class TicketService
         }
 
         if ($lastStatus === TicketStatus::OnHold && $ticket->status === TicketStatus::Open) {
+            $pausedSeconds = $ticket->last_sla_paused_at?->diffInSeconds(now()) ?? 0;
             $ticket->update([
-                'sla_paused_time' => ceil($ticket->sla_paused_time + $ticket->last_sla_paused_at->diffInSeconds(now())),
+                'sla_paused_time' => ceil($ticket->sla_paused_time + $pausedSeconds),
             ]);
         }
 

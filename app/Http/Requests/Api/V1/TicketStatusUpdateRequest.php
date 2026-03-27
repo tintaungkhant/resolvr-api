@@ -31,6 +31,6 @@ class TicketStatusUpdateRequest extends FormRequest
 
     public function ticketStatus(): TicketStatus
     {
-        return TicketStatus::tryFrom($this->input('status'));
+        return TicketStatus::from($this->input('status'));
     }
 }

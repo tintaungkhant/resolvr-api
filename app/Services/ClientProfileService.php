@@ -7,7 +7,7 @@ use App\Models\Client;
 
 class ClientProfileService
 {
-    public function forUser(User $user): Client
+    public function forUser(User $user): ?Client
     {
         $user->load('client.organization');
 

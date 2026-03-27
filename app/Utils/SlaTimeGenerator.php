@@ -6,7 +6,7 @@ use App\Enums\TicketSlaPriority;
 
 class SlaTimeGenerator
 {
-    public static function generate(TicketSlaPriority $priority)
+    public static function generate(TicketSlaPriority $priority): int
     {
         return match ($priority) {
             TicketSlaPriority::Low    => 8 * 60 * 60,

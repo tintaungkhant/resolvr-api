@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property UserRole $role
+ */
 #[Fillable(['role'])]
 #[Hidden(['two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
@@ -35,11 +38,13 @@ class User extends Authenticatable
         ];
     }
 
+    /** @return HasOne<Agent, $this> */
     public function agent(): HasOne
     {
         return $this->hasOne(Agent::class);
     }
 
+    /** @return HasOne<Client, $this> */
     public function client(): HasOne
     {
         return $this->hasOne(Client::class);

@@ -31,6 +31,6 @@ class TicketPriorityUpdateRequest extends FormRequest
 
     public function ticketSlaPriority(): TicketSlaPriority
     {
-        return TicketSlaPriority::tryFrom($this->input('priority'));
+        return TicketSlaPriority::from($this->input('priority'));
     }
 }
