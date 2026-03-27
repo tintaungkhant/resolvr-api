@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1\Client;
 
+use App\Http\Resources\V1\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,10 @@ class TicketMessageResource extends JsonResource
             "content" => $this->resource->content,
             "is_internal" => $this->resource->is_internal,
             "created_at" => $this->resource->created_at,
+            "user" => $this->whenLoaded(
+                'user',
+                fn() => UserResource::make($this->resource->user)
+            ),
         ];
     }
 }
