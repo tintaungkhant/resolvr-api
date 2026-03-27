@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\TicketResource;
 use App\Http\Requests\Api\V1\TicketStatusUpdateRequest;
 use App\Http\Requests\Api\V1\TicketPriorityUpdateRequest;
 use App\Policies\Agent\TicketPolicy as AgentTicketPolicy;
+use App\Http\Requests\Api\V1\Agent\TicketAssigneeUpdateRequest;
 
 class TicketController extends Controller
 {
@@ -51,6 +52,13 @@ class TicketController extends Controller
         $this->authorizePolicy(AgentTicketPolicy::class, 'update', $ticket);
 
         $this->ticketService->updateStatus($ticket, $request->ticketStatus());
+
+        return successResponse(TicketResource::make($ticket));
+    }
+
+    public function updateAssignee(Ticket $ticket, TicketAssigneeUpdateRequest $request): JsonResponse
+    {
+        $this->ticketService->updateAssignee($ticket, $request->assigneeId());
 
         return successResponse(TicketResource::make($ticket));
     }

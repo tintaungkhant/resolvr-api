@@ -119,6 +119,15 @@ class TicketService
         return $ticket;
     }
 
+    public function updateAssignee(Ticket $ticket, int $assigneeId): Ticket
+    {
+        $ticket->update([
+            'assignee_id' => $assigneeId,
+        ]);
+
+        return $ticket;
+    }
+
     private function resolveAssigneeUserId(): ?int
     {
         $activeStatuses = [TicketStatus::Open->value, TicketStatus::OnHold->value];
