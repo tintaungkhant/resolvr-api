@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\TicketStatusUpdateRequest;
 use App\Http\Resources\Api\V1\TicketResource;
 use App\Models\Ticket;
 use App\Utils\SlaTimeCalculator;
+use App\Utils\SlaTimeGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
