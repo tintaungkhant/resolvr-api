@@ -8,7 +8,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('client')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
 
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', 'abilities:role:client'])->group(function () {
             Route::get('user', [UserController::class, 'show']);
         });
     });

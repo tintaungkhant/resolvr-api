@@ -15,21 +15,16 @@ class AuthController extends Controller
         $profile = Agent::where('email', $request->email)->first();
 
         if (!$profile) {
-            return response()->json([
-                'message' => 'Invalid credentials',
-            ], 401);
+            return errorResponse(null, 'Invalid credentials');
         }
 
         if (!Hash::check($request->password, $profile->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials',
-            ], 401);
+            return errorResponse(null, 'Invalid credentials');
         }
 
         $user = $profile->user;
 
-        return response()->json([
-            'message' => 'Login successful',
+        return successResponse([
             'token' => $user->createToken('auth_token', ['role:'.$user->role->value])->plainTextToken,
         ]);
     }
