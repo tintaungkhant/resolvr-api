@@ -12,6 +12,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:sanctum', 'abilities:role:client'])->group(function () {
             Route::get('profile', [ProfileController::class, 'show']);
 
+            Route::get('tickets', [TicketController::class, 'index']);
             Route::post('tickets', [TicketController::class, 'store']);
         });
     });

@@ -11,6 +11,21 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
+    public function index(Request $request)
+    {
+        $type = $request->query('type', 'mine');
+
+        $user = $request->user();
+
+        if($type === 'mine') {
+            $tickets = Ticket::where('issuer_id', $user->id)->latest('id')->paginate();
+        } else {
+            $tickets = Ticket::where('organization_id', $user->client->organization_id)->latest('id')->paginate();
+        }
+
+        return successResponse(TicketResource::collection($tickets));
+    }
+    
     public function store(TicketStoreRequest $request)
     {
         $user = $request->user();
