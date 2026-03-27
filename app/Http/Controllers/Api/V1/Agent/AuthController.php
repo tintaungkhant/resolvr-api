@@ -4,27 +4,25 @@ namespace App\Http\Controllers\Api\V1\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Agent\LoginRequest;
-use App\Models\Agent;
-use Illuminate\Support\Facades\Hash;
+use App\Services\AgentAuthService;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private AgentAuthService $agentAuthService,
+    ) {}
+
     public function login(LoginRequest $request)
     {
-        $profile = Agent::where('email', $request->email)->first();
+        $payload = $this->agentAuthService->login(
+            $request->validated('email'),
+            $request->validated('password'),
+        );
 
-        if (! $profile) {
+        if ($payload === null) {
             return errorResponse(null, 'Invalid credentials');
         }
 
-        if (! Hash::check($request->password, $profile->password)) {
-            return errorResponse(null, 'Invalid credentials');
-        }
-
-        $user = $profile->user;
-
-        return successResponse([
-            'token' => $user->createToken('auth_token', ['role:'.$user->role->value])->plainTextToken,
-        ]);
+        return successResponse($payload);
     }
 }
