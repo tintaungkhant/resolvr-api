@@ -1,0 +1,12 @@
+includes:
+	- phpstan-baseline.neon
+parameters:
+    paths:
+        - app
+        - bootstrap
+        - database/factories
+        - routes
+    level: 8
+    excludePaths:
+        - bootstrap/cache/*
+    ignoreErrors:
