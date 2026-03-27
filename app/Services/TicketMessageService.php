@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketMessageService
@@ -14,9 +15,11 @@ class TicketMessageService
      */
     public function paginateForAgent(Ticket $ticket): LengthAwarePaginator
     {
-        return $ticket->messages()->with(['user' => function ($q) {
+        $relation = $ticket->messages()->with(['user' => function ($q) {
             $q->with(['agent', 'client']);
-        }])->latest('id')->paginate();
+        }]);
+
+        return $this->paginateLatestReversed($relation);
     }
 
     /**
@@ -24,12 +27,11 @@ class TicketMessageService
      */
     public function paginateForClient(Ticket $ticket): LengthAwarePaginator
     {
-        return $ticket->messages()->with(['user' => function ($q) {
+        $relation = $ticket->messages()->with(['user' => function ($q) {
             $q->with(['agent', 'client']);
-        }])
-            ->where('is_internal', false)
-            ->latest('id')
-            ->paginate();
+        }])->where('is_internal', false);
+
+        return $this->paginateLatestReversed($relation);
     }
 
     public function storeForAgent(Ticket $ticket, User $user, string $content, bool $isInternal): TicketMessage
@@ -58,5 +60,13 @@ class TicketMessageService
         $message->load('user');
 
         return $message;
+    }
+
+    private function paginateLatestReversed(HasMany $relation): LengthAwarePaginator
+    {
+        $paginator = $relation->latest('id')->paginate();
+        $paginator->setCollection($paginator->getCollection()->reverse()->values());
+
+        return $paginator;
     }
 }
