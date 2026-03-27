@@ -17,7 +17,6 @@ class ProfileController extends Controller
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
-        abort_if($user === null, 401);
 
         $profile = $this->agentProfileService->forUser($user);
 

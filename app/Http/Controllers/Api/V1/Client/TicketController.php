@@ -21,7 +21,6 @@ class TicketController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        abort_if($user === null, 401);
 
         $type = $request->query('type', 'mine');
         $tickets = $this->ticketService->paginateForClient($user, $type);
@@ -32,7 +31,6 @@ class TicketController extends Controller
     public function store(TicketStoreRequest $request): JsonResponse
     {
         $user = $request->user();
-        abort_if($user === null, 401);
 
         $ticket = $this->ticketService->createForClient(
             $user,

@@ -25,7 +25,6 @@ class TicketMessageController extends Controller
     public function store(Ticket $ticket, TicketMessageStoreRequest $request): JsonResponse
     {
         $user = $request->user();
-        abort_if($user === null, 401);
 
         $message = $this->ticketMessageService->storeForClient(
             $ticket,

@@ -20,7 +20,6 @@ class TicketController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        abort_if($user === null, 401);
 
         $type = $request->query('type', 'mine');
         $tickets = $this->ticketService->paginateForAgent($user, $type);
