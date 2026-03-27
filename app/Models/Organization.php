@@ -10,6 +10,5 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable(['name'])]
 class Organization extends Model
 {
-    /** @use HasFactory<OrganizationFactory> */
     use HasFactory;
 }

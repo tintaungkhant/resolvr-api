@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\Agent\AuthController as AgentAuthController;
+use App\Http\Controllers\Api\V1\Client\AuthController as ClientAuthController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+include __DIR__.'/api-agent.php';
+include __DIR__.'/api-client.php';

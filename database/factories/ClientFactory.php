@@ -22,7 +22,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'organization_id' => Organization::factory(),
+            'organization_id' => Organization::inRandomOrder()->first()->id,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
