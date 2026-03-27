@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\User;
+use App\Models\Agent;
 use App\Models\Ticket;
+use App\Enums\UserRole;
 use App\Enums\TicketStatus;
 use App\Models\Organization;
 use App\Enums\TicketSlaStatus;
@@ -90,6 +92,133 @@ describe('ticket creation sets SLA fields', function () {
         expect($ticket->messages)->toHaveCount(1)
             ->and($ticket->messages->first()->content)->toBe('My description here')
             ->and($ticket->messages->first()->is_internal)->toBeFalse();
+    });
+});
+
+describe('ticket creation assigns an agent', function () {
+    beforeEach(function () {
+        $this->user->client()->create([
+            'organization_id' => $this->organization->id,
+            'name'            => 'Test Client',
+            'email'           => 'client@test.com',
+            'password'        => 'password',
+        ]);
+    });
+
+    it('leaves assignee null when there are no agents', function () {
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBeNull();
+    });
+
+    it('assigns a free agent when one exists', function () {
+        $agentUser = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $agentUser->id]);
+
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBe($agentUser->id);
+    });
+
+    it('prefers an agent with no active tickets over a busy one', function () {
+        $busyUser = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $busyUser->id]);
+        $freeUser = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $freeUser->id]);
+
+        Ticket::factory()->create([
+            'organization_id' => $this->organization->id,
+            'assignee_id'     => $busyUser->id,
+            'status'          => TicketStatus::Open,
+        ]);
+
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBe($freeUser->id);
+    });
+
+    it('assigns to the agent with the smallest active load when all are busy', function () {
+        $userA = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $userA->id]);
+        $userB = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $userB->id]);
+
+        Ticket::factory()->count(2)->create([
+            'organization_id' => $this->organization->id,
+            'assignee_id'     => $userA->id,
+            'status'          => TicketStatus::Open,
+        ]);
+        Ticket::factory()->create([
+            'organization_id' => $this->organization->id,
+            'assignee_id'     => $userB->id,
+            'status'          => TicketStatus::Open,
+        ]);
+
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBe($userB->id);
+    });
+
+    it('ignores resolved tickets when measuring load', function () {
+        $quietUser = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $quietUser->id]);
+        $busyUser = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $busyUser->id]);
+
+        Ticket::factory()->resolved()->create([
+            'organization_id' => $this->organization->id,
+            'assignee_id'     => $quietUser->id,
+        ]);
+        Ticket::factory()->create([
+            'organization_id' => $this->organization->id,
+            'assignee_id'     => $busyUser->id,
+            'status'          => TicketStatus::Open,
+        ]);
+
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBe($quietUser->id);
+    });
+
+    it('breaks ties between equally loaded agents by lowest user id', function () {
+        $first = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $first->id]);
+        $second = User::factory()->create(['role' => UserRole::Agent]);
+        Agent::factory()->create(['user_id' => $second->id]);
+
+        $ticket = $this->service->createForClient(
+            $this->user,
+            'Test Ticket',
+            'Description',
+            TicketSlaPriority::Low,
+        );
+
+        expect($ticket->assignee_id)->toBe(min($first->id, $second->id));
     });
 });
 

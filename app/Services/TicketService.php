@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\Agent;
 use App\Models\Ticket;
 use App\Enums\TicketStatus;
 use App\Utils\SlaTimeGenerator;
@@ -20,9 +21,7 @@ class TicketService
     public function paginateForAgent(User $user, string $type): LengthAwarePaginator
     {
         if ($type === 'mine') {
-            $agent = $user->agent;
-
-            return Ticket::where('assignee_id', $agent?->id)->latest('id')->paginate();
+            return Ticket::where('assignee_id', $user->id)->latest('id')->paginate();
         }
 
         return Ticket::latest('id')->paginate();
@@ -52,6 +51,7 @@ class TicketService
             $ticket = Ticket::create([
                 'organization_id'     => $organizationId,
                 'issuer_id'           => $user->id,
+                'assignee_id'         => $this->resolveAssigneeUserId(),
                 'title'               => $title,
                 'description'         => $description,
                 'priority'            => $priority,
@@ -117,5 +117,24 @@ class TicketService
         }
 
         return $ticket;
+    }
+
+    private function resolveAssigneeUserId(): ?int
+    {
+        $activeStatuses = [TicketStatus::Open->value, TicketStatus::OnHold->value];
+
+        $activeTicketCounts = Ticket::query()
+            ->selectRaw('assignee_id, COUNT(*) as active_count')
+            ->whereIn('status', $activeStatuses)
+            ->whereNotNull('assignee_id')
+            ->groupBy('assignee_id');
+
+        return Agent::query()
+            ->leftJoinSub($activeTicketCounts, 'ticket_counts', function ($join): void {
+                $join->on('agents.user_id', '=', 'ticket_counts.assignee_id');
+            })
+            ->orderByRaw('COALESCE(ticket_counts.active_count, 0) asc')
+            ->orderBy('agents.user_id')
+            ->value('agents.user_id');
     }
 }
