@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Client\AuthController;
 use App\Http\Controllers\Api\V1\Client\ProfileController;
 use App\Http\Controllers\Api\V1\Client\TicketController;
+use App\Http\Controllers\Api\V1\Client\TicketMessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -15,6 +16,9 @@ Route::prefix('v1')->group(function () {
             Route::get('tickets', [TicketController::class, 'index']);
             Route::post('tickets', [TicketController::class, 'store']);
             Route::get('tickets/{ticket}', [TicketController::class, 'show']);
+
+            Route::get('tickets/{ticket}/messages', [TicketMessageController::class, 'index']);
+            Route::post('tickets/{ticket}/messages', [TicketMessageController::class, 'store']);
         });
     });
 });
