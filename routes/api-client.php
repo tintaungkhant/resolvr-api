@@ -16,6 +16,8 @@ Route::prefix('v1')->group(function () {
             Route::get('tickets', [TicketController::class, 'index']);
             Route::post('tickets', [TicketController::class, 'store']);
             Route::get('tickets/{ticket}', [TicketController::class, 'show']);
+            Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
+            Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
 
             Route::get('tickets/{ticket}/messages', [TicketMessageController::class, 'index']);
             Route::post('tickets/{ticket}/messages', [TicketMessageController::class, 'store']);
