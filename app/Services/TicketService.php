@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Enums\TicketSlaPriority;
-use App\Enums\TicketStatus;
-use App\Models\Ticket;
 use App\Models\User;
-use App\Utils\SlaTimeCalculator;
+use App\Models\Ticket;
+use App\Enums\TicketStatus;
 use App\Utils\SlaTimeGenerator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Enums\TicketSlaPriority;
+use App\Utils\SlaTimeCalculator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketService
 {
@@ -38,19 +38,19 @@ class TicketService
 
         return DB::transaction(function () use ($user, $title, $description, $priority, $slaResolutionTime) {
             $ticket = Ticket::create([
-                'organization_id' => $user->client->organization_id,
-                'issuer_id' => $user->id,
-                'title' => $title,
-                'description' => $description,
-                'priority' => $priority,
-                'started_at' => now(),
+                'organization_id'     => $user->client->organization_id,
+                'issuer_id'           => $user->id,
+                'title'               => $title,
+                'description'         => $description,
+                'priority'            => $priority,
+                'started_at'          => now(),
                 'sla_resolution_time' => $slaResolutionTime,
-                'due_at' => now()->addSeconds($slaResolutionTime),
+                'due_at'              => now()->addSeconds($slaResolutionTime),
             ]);
 
             $ticket->messages()->create([
-                'user_id' => $user->id,
-                'content' => $description,
+                'user_id'     => $user->id,
+                'content'     => $description,
                 'is_internal' => false,
             ]);
 
@@ -64,12 +64,12 @@ class TicketService
 
         $ticket->update([
             'sla_resolution_time' => SlaTimeGenerator::generate($priority),
-            'priority' => $priority,
+            'priority'            => $priority,
         ]);
 
         if ($lastPriority !== $ticket->priority) {
             $ticket->update([
-                'due_at' => SlaTimeCalculator::calcDueAt($ticket),
+                'due_at'     => SlaTimeCalculator::calcDueAt($ticket),
                 'sla_status' => SlaTimeCalculator::calcSlaStatus($ticket),
             ]);
         }

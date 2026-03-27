@@ -3,9 +3,9 @@
 namespace App\Http\Requests\Api\V1;
 
 use App\Enums\TicketStatus;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class TicketStatusUpdateRequest extends FormRequest
 {

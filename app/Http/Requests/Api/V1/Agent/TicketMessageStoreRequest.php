@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api\V1\Agent;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class TicketMessageStoreRequest extends FormRequest
 {
@@ -23,7 +23,7 @@ class TicketMessageStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'max:3000'],
+            'content'     => ['required', 'string', 'max:3000'],
             'is_internal' => ['nullable', 'boolean'],
         ];
     }

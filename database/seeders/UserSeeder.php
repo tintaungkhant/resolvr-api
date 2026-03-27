@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
+use App\Models\User;
 use App\Models\Agent;
 use App\Models\Client;
+use App\Enums\UserRole;
 use App\Models\Organization;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
 
             Agent::factory()->create([
                 'user_id' => $user->id,
-                'email' => 'agent'.$x.'@gmail.com',
+                'email'   => 'agent'.$x.'@gmail.com',
             ]);
 
             $x++;
@@ -38,9 +38,9 @@ class UserSeeder extends Seeder
                 ]);
 
                 Client::factory()->create([
-                    'user_id' => $user->id,
+                    'user_id'         => $user->id,
                     'organization_id' => $organization->id,
-                    'email' => 'client'.$y.'@gmail.com',
+                    'email'           => 'client'.$y.'@gmail.com',
                 ]);
 
                 $y++;

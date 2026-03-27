@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Agent;
 use App\Models\User;
+use App\Models\Agent;
 
 class AgentProfileService
 {

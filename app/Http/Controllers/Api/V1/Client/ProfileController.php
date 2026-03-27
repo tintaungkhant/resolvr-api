@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\ProfileResource;
-use App\Services\ClientProfileService;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\ClientProfileService;
+use App\Http\Resources\Api\V1\ProfileResource;
 
 class ProfileController extends Controller
 {

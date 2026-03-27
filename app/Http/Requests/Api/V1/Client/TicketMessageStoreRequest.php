@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api\V1\Client;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class TicketMessageStoreRequest extends FormRequest
 {

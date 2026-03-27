@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\Agent;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\TicketPriorityUpdateRequest;
-use App\Http\Requests\Api\V1\TicketStatusUpdateRequest;
-use App\Http\Resources\Api\V1\TicketResource;
 use App\Models\Ticket;
-use App\Services\TicketService;
 use Illuminate\Http\Request;
+use App\Services\TicketService;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\TicketResource;
+use App\Http\Requests\Api\V1\TicketStatusUpdateRequest;
+use App\Http\Requests\Api\V1\TicketPriorityUpdateRequest;
 
 class TicketController extends Controller
 {

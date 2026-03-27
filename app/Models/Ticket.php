@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Enums\TicketSlaPriority;
-use App\Enums\TicketSlaStatus;
 use App\Enums\TicketStatus;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\TicketSlaStatus;
+use App\Enums\TicketSlaPriority;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable([
     'organization_id',
@@ -32,13 +32,13 @@ class Ticket extends Model
     use HasFactory;
 
     protected $casts = [
-        'priority' => TicketSlaPriority::class,
-        'status' => TicketStatus::class,
-        'sla_status' => TicketSlaStatus::class,
+        'priority'           => TicketSlaPriority::class,
+        'status'             => TicketStatus::class,
+        'sla_status'         => TicketSlaStatus::class,
         'last_sla_paused_at' => 'datetime',
-        'due_at' => 'datetime',
-        'resolved_at' => 'datetime',
-        'overdue_at' => 'datetime',
+        'due_at'             => 'datetime',
+        'resolved_at'        => 'datetime',
+        'overdue_at'         => 'datetime',
     ];
 
     public function messages(): HasMany

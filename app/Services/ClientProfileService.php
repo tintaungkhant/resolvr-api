@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Client;
 use App\Models\User;
+use App\Models\Client;
 
 class ClientProfileService
 {

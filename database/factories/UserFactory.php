@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\UserRole;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends Factory<User>
@@ -25,7 +25,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'role' => fake()->randomElement(UserRole::cases()),
+            'role'           => fake()->randomElement(UserRole::cases()),
             'remember_token' => Str::random(10),
         ];
     }

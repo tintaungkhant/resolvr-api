@@ -20,20 +20,20 @@ class UserResource extends JsonResource
 
         if ($resource->role === UserRole::Agent) {
             return [
-                'id' => $resource->agent->id,
+                'id'      => $resource->agent->id,
                 'user_id' => $resource->id,
-                'role' => $resource->role,
-                'name' => $resource->agent->name,
-                'email' => $resource->agent->email,
+                'role'    => $resource->role,
+                'name'    => $resource->agent->name,
+                'email'   => $resource->agent->email,
             ];
         }
 
         return [
-            'id' => $resource->client->id,
-            'user_id' => $resource->id,
-            'role' => $resource->role,
-            'name' => $resource->client->name,
-            'email' => $resource->client->email,
+            'id'           => $resource->client->id,
+            'user_id'      => $resource->id,
+            'role'         => $resource->role,
+            'name'         => $resource->client->name,
+            'email'        => $resource->client->email,
             'organization' => $this->whenLoaded(
                 'organization',
                 fn () => OrganizationResource::make($resource->client->organization)

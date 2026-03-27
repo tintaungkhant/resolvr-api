@@ -2,9 +2,9 @@
 
 namespace App\Utils;
 
-use App\Enums\TicketSlaStatus;
-use App\Enums\TicketStatus;
 use App\Models\Ticket;
+use App\Enums\TicketStatus;
+use App\Enums\TicketSlaStatus;
 use Illuminate\Support\Carbon;
 
 class SlaTimeCalculator

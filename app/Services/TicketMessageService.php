@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
-use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketMessageService
@@ -29,8 +29,8 @@ class TicketMessageService
     public function storeForAgent(Ticket $ticket, User $user, string $content, bool $isInternal): TicketMessage
     {
         $message = $ticket->messages()->create([
-            'user_id' => $user->id,
-            'content' => $content,
+            'user_id'     => $user->id,
+            'content'     => $content,
             'is_internal' => $isInternal,
         ]);
 
@@ -42,8 +42,8 @@ class TicketMessageService
     public function storeForClient(Ticket $ticket, User $user, string $content): TicketMessage
     {
         $message = $ticket->messages()->create([
-            'user_id' => $user->id,
-            'content' => $content,
+            'user_id'     => $user->id,
+            'content'     => $content,
             'is_internal' => false,
         ]);
 

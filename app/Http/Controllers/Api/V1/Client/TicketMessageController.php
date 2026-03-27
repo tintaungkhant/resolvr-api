@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Client\TicketMessageStoreRequest;
-use App\Http\Resources\Api\V1\TicketMessageResource;
 use App\Models\Ticket;
+use App\Http\Controllers\Controller;
 use App\Services\TicketMessageService;
+use App\Http\Resources\Api\V1\TicketMessageResource;
+use App\Http\Requests\Api\V1\Client\TicketMessageStoreRequest;
 
 class TicketMessageController extends Controller
 {

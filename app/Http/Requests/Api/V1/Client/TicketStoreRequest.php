@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Api\V1\Client;
 
-use App\Enums\TicketSlaPriority;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Enums\TicketSlaPriority;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 class TicketStoreRequest extends FormRequest
 {
@@ -25,9 +25,9 @@ class TicketStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title'       => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:3000'],
-            'priority' => ['required', 'string', Rule::enum(TicketSlaPriority::class)],
+            'priority'    => ['required', 'string', Rule::enum(TicketSlaPriority::class)],
         ];
     }
 

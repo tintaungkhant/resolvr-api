@@ -2,19 +2,19 @@
 
 namespace App\Utils;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Throwable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Throwable;
 
 final class Response
 {
@@ -34,7 +34,7 @@ final class Response
             array_merge(
                 [
                     'success' => true,
-                    'code' => self::CODE_SUCCESS,
+                    'code'    => self::CODE_SUCCESS,
                     'message' => $message ?? 'Success',
                 ],
                 self::normalizeSuccessPayload($data),
@@ -141,17 +141,17 @@ final class Response
 
         $body = [
             'success' => false,
-            'code' => self::resolveErrorCode($e),
+            'code'    => self::resolveErrorCode($e),
             'message' => self::resolveErrorMessage($e, $status),
-            'errors' => self::resolveValidationErrors($e),
+            'errors'  => self::resolveValidationErrors($e),
         ];
 
         if (config('app.debug')) {
             $body['debug'] = [
                 'exception' => $e::class,
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString(),
+                'file'      => $e->getFile(),
+                'line'      => $e->getLine(),
+                'trace'     => $e->getTraceAsString(),
             ];
         }
 
@@ -188,9 +188,9 @@ final class Response
         $body = array_merge(
             [
                 'success' => false,
-                'code' => $code,
+                'code'    => $code,
                 'message' => $resolvedMessage,
-                'errors' => $errors,
+                'errors'  => $errors,
             ],
             $extra,
         );
@@ -223,12 +223,12 @@ final class Response
     private static function resolveHttpStatus(Throwable $e): int
     {
         return match (true) {
-            $e instanceof ValidationException => $e->status,
+            $e instanceof ValidationException     => $e->status,
             $e instanceof AuthenticationException => 401,
-            $e instanceof AuthorizationException => $e->status() ?? 403,
-            $e instanceof ModelNotFoundException => 404,
-            $e instanceof HttpExceptionInterface => $e->getStatusCode(),
-            default => 500,
+            $e instanceof AuthorizationException  => $e->status() ?? 403,
+            $e instanceof ModelNotFoundException  => 404,
+            $e instanceof HttpExceptionInterface  => $e->getStatusCode(),
+            default                               => 500,
         };
     }
 
@@ -260,10 +260,10 @@ final class Response
 
         if ($e instanceof HttpExceptionInterface) {
             return match ($e->getStatusCode()) {
-                404 => 'not_found',
-                403 => 'forbidden',
-                401 => 'unauthorized',
-                422 => 'unprocessable_entity',
+                404     => 'not_found',
+                403     => 'forbidden',
+                401     => 'unauthorized',
+                422     => 'unprocessable_entity',
                 default => 'http_error',
             };
         }
