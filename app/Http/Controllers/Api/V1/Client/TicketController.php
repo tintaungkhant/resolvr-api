@@ -55,6 +55,8 @@ class TicketController extends Controller
                 'content' => $request->validated('description'),
                 'is_internal' => false,
             ]);
+
+            return $ticket;
         });
 
         return successResponse(TicketResource::make($ticket));
@@ -70,6 +72,7 @@ class TicketController extends Controller
         $lastPriority = $ticket->priority;
 
         $ticket->update([
+            'sla_resolution_time' => SlaTimeGenerator::generate($request->ticketSlaPriority()),
             'priority' => $request->ticketSlaPriority(),
         ]);
 
@@ -105,7 +108,7 @@ class TicketController extends Controller
 
         if($lastStatus === TicketStatus::OnHold && $ticket->status === TicketStatus::Open){
             $ticket->update([
-                'sla_paused_time' => $ticket->sla_paused_time + $ticket->last_sla_paused_at->diffInSeconds(now()),
+                'sla_paused_time' => ceil($ticket->sla_paused_time + $ticket->last_sla_paused_at->diffInSeconds(now())),
             ]);
         }
 
