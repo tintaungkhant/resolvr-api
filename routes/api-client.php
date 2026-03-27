@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Client\AuthController;
+use App\Http\Controllers\Api\V1\Client\TicketController;
 use App\Http\Controllers\Api\V1\Client\UserController;
 
 Route::prefix('v1')->group(function () {
@@ -10,6 +11,8 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware(['auth:sanctum', 'abilities:role:client'])->group(function () {
             Route::get('user', [UserController::class, 'show']);
+
+            Route::post('tickets', [TicketController::class, 'store']);
         });
     });
 });
