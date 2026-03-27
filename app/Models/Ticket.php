@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Enums\TicketStatus;
 use App\Enums\TicketSlaStatus;
 use App\Enums\TicketSlaPriority;
+use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable([
     'organization_id',
@@ -28,6 +30,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 ])]
 class Ticket extends Model
 {
+    /** @use HasFactory<TicketFactory> */
+    use HasFactory;
+
     protected $casts = [
         'priority'           => TicketSlaPriority::class,
         'status'             => TicketStatus::class,
