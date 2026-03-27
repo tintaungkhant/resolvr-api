@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Client\TicketStoreRequest;
-use App\Http\Resources\Api\V1\Client\TicketResource;
+use App\Http\Resources\Api\V1\TicketResource;
 use App\Models\Ticket;
 use App\Utils\SlaTimeGenerator;
 use Illuminate\Http\Request;
@@ -49,6 +49,11 @@ class TicketController extends Controller
             'is_internal' => false,
         ]);
 
+        return successResponse(TicketResource::make($ticket));
+    }
+
+    public function show(Ticket $ticket)
+    {
         return successResponse(TicketResource::make($ticket));
     }
 }

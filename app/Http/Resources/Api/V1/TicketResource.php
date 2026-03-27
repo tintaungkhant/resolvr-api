@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Client;
+namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -33,10 +33,6 @@ class TicketResource extends JsonResource
             'last_sla_paused_at' => $this->resource->last_sla_paused_at,
             "updated_at" => $this->resource->updated_at,
             "created_at" => $this->resource->created_at,
-            "messages" => $this->whenLoaded(
-                'messages',
-                fn() => TicketMessageResource::collection($this->resource->messages)
-            ),
         ];
     }
 }
