@@ -5,10 +5,11 @@ namespace App\Utils;
 use App\Enums\TicketSlaStatus;
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
+use Illuminate\Support\Carbon;
 
 class SlaTimeCalculator
 {
-    public static function calcConsumedTime(Ticket $ticket)
+    public static function calcConsumedTime(Ticket $ticket): int
     {
         $totalPausedTime = $ticket->sla_paused_time;
         if ($ticket->status === TicketStatus::OnHold) {
@@ -19,33 +20,38 @@ class SlaTimeCalculator
 
         $totalConsumedTime = $totalDuration - $totalPausedTime;
 
-        return max(0, ceil($totalConsumedTime));
+        return max(0, (int) ceil($totalConsumedTime));
     }
 
-    public static function calcSlaPercentage(Ticket $ticket)
+    public static function calcSlaPercentage(Ticket $ticket): int
     {
+        if ($ticket->sla_resolution_time <= 0) {
+            return 0;
+        }
+
         $consumedTime = self::calcConsumedTime($ticket);
 
-        return ceil($consumedTime / $ticket->sla_resolution_time * 100);
+        return (int) ceil($consumedTime / $ticket->sla_resolution_time * 100);
     }
 
-    public static function calcSlaStatus(Ticket $ticket)
+    public static function calcSlaStatus(Ticket $ticket): TicketSlaStatus
     {
         $slaPercentage = self::calcSlaPercentage($ticket);
 
-        switch ($slaPercentage) {
-            case $slaPercentage < 80:
-                return TicketSlaStatus::OnTrack;
-            case $slaPercentage < 100:
-                return TicketSlaStatus::DueSoon;
-            default:
-                return TicketSlaStatus::Overdue;
+        if ($slaPercentage < 80) {
+            return TicketSlaStatus::OnTrack;
         }
+
+        if ($slaPercentage < 100) {
+            return TicketSlaStatus::DueSoon;
+        }
+
+        return TicketSlaStatus::Overdue;
     }
 
-    public static function calcDueAt(Ticket $ticket)
+    public static function calcDueAt(Ticket $ticket): Carbon
     {
-        $dueAt = $ticket->created_at->addSeconds($ticket->sla_resolution_time + $ticket->sla_paused_time);
+        $dueAt = $ticket->created_at->copy()->addSeconds($ticket->sla_resolution_time + $ticket->sla_paused_time);
 
         if ($ticket->status === TicketStatus::OnHold && $ticket->last_sla_paused_at) {
             $currentHoldDuration = $ticket->last_sla_paused_at->diffInSeconds(now());
