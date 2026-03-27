@@ -18,7 +18,7 @@ class UserResource extends JsonResource
 
         $resource = $this->resource;
 
-        if($resource->role === UserRole::Agent) {
+        if ($resource->role === UserRole::Agent) {
             return [
                 'id' => $resource->agent->id,
                 'user_id' => $resource->id,
@@ -36,8 +36,8 @@ class UserResource extends JsonResource
             'email' => $resource->client->email,
             'organization' => $this->whenLoaded(
                 'organization',
-                fn() => OrganizationResource::make($resource->client->organization)
-            )
+                fn () => OrganizationResource::make($resource->client->organization)
+            ),
         ];
     }
 }

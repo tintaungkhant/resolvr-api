@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Client\AuthController;
-use App\Http\Controllers\Api\V1\Client\TicketController;
 use App\Http\Controllers\Api\V1\Client\ProfileController;
+use App\Http\Controllers\Api\V1\Client\TicketController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('client')->group(function () {

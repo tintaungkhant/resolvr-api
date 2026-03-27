@@ -11,7 +11,7 @@ class SlaTimeCalculator
     public static function calcConsumedTime(Ticket $ticket)
     {
         $totalPausedTime = $ticket->sla_paused_time;
-        if($ticket->status === TicketStatus::OnHold){
+        if ($ticket->status === TicketStatus::OnHold) {
             $totalPausedTime += $ticket->last_sla_paused_at->diffInSeconds(now());
         }
 
@@ -33,7 +33,7 @@ class SlaTimeCalculator
     {
         $slaPercentage = self::calcSlaPercentage($ticket);
 
-        switch($slaPercentage){
+        switch ($slaPercentage) {
             case $slaPercentage < 80:
                 return TicketSlaStatus::OnTrack;
             case $slaPercentage < 100:

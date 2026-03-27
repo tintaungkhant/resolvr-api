@@ -15,15 +15,15 @@ class TicketMessageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id" => $this->resource->id,
-            "ticket_id" => $this->resource->ticket_id,
-            "user_id" => $this->resource->user_id,
-            "content" => $this->resource->content,
-            "is_internal" => $this->resource->is_internal,
-            "created_at" => $this->resource->created_at,
-            "user" => $this->whenLoaded(
+            'id' => $this->resource->id,
+            'ticket_id' => $this->resource->ticket_id,
+            'user_id' => $this->resource->user_id,
+            'content' => $this->resource->content,
+            'is_internal' => $this->resource->is_internal,
+            'created_at' => $this->resource->created_at,
+            'user' => $this->whenLoaded(
                 'user',
-                fn() => UserResource::make($this->resource->user)
+                fn () => UserResource::make($this->resource->user)
             ),
         ];
     }

@@ -22,7 +22,7 @@ class ProfileResource extends JsonResource
             'email' => $this->resource->email,
             'organization' => $this->whenLoaded(
                 'organization',
-                fn() => OrganizationResource::make($this->resource->organization)
+                fn () => OrganizationResource::make($this->resource->organization)
             ),
         ];
     }

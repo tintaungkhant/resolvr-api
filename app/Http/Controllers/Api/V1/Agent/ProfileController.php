@@ -11,7 +11,7 @@ class ProfileController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        
+
         return successResponse(ProfileResource::make($user->agent));
     }
 }

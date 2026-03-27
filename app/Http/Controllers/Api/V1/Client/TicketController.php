@@ -17,7 +17,7 @@ class TicketController extends Controller
 
         $user = $request->user();
 
-        if($type === 'mine') {
+        if ($type === 'mine') {
             $tickets = Ticket::where('issuer_id', $user->id)->latest('id')->paginate();
         } else {
             $tickets = Ticket::where('organization_id', $user->client->organization_id)->latest('id')->paginate();
@@ -25,7 +25,7 @@ class TicketController extends Controller
 
         return successResponse(TicketResource::collection($tickets));
     }
-    
+
     public function store(TicketStoreRequest $request)
     {
         $user = $request->user();

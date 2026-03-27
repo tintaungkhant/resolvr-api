@@ -31,8 +31,8 @@ class TicketResource extends JsonResource
             'resolved_at' => $this->resource->resolved_at,
             'overdue_at' => $this->resource->overdue_at,
             'last_sla_paused_at' => $this->resource->last_sla_paused_at,
-            "updated_at" => $this->resource->updated_at,
-            "created_at" => $this->resource->created_at,
+            'updated_at' => $this->resource->updated_at,
+            'created_at' => $this->resource->created_at,
         ];
     }
 }
