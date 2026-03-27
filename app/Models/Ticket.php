@@ -8,7 +8,6 @@ use App\Enums\TicketSlaPriority;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable([
     'organization_id',
