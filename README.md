@@ -9,7 +9,7 @@ A support ticket portal built with Laravel 13 where customer organisations submi
 - **Backend:** Laravel 13, PHP 8.4
 - **Authentication:** Laravel Sanctum v4 (token-based)
 - **Database:** MySQL/MariaDB
-- **Frontend:** SvelteKit (separate project — [`resolvr-frontend`](https://github.com/tintaungkhant/resolvr-frontend))
+- **Frontend:** SvelteKit (separate project — `[resolvr-frontend](https://github.com/tintaungkhant/resolvr-frontend)`)
 - **Testing:** Pest v4
 - **Code Quality:** Larastan (PHPStan), Laravel Pint
 
@@ -77,10 +77,10 @@ The `User` model handles authentication and role. `Agent` and `Client` are profi
 
 Business logic lives in service classes, not controllers:
 
-- **`TicketService`** — Ticket CRUD, priority/status updates, assignee changes, SLA recalculation, auto-assignment, advanced filtering
-- **`TicketMessageService`** — Message pagination (with internal note filtering for clients), message creation
-- **`AgentAuthService` / `ClientAuthService`** — Login and token generation
-- **`AgentProfileService` / `ClientProfileService`** — Profile retrieval
+- `**TicketService`** — Ticket CRUD, priority/status updates, assignee changes, SLA recalculation, auto-assignment, advanced filtering
+- `**TicketMessageService**` — Message pagination (with internal note filtering for clients), message creation
+- `**AgentAuthService` / `ClientAuthService**` — Login and token generation
+- `**AgentProfileService` / `ClientProfileService**` — Profile retrieval
 
 Controllers are thin — they authorize, delegate to services, and return resources.
 
@@ -89,24 +89,30 @@ Controllers are thin — they authorize, delegate to services, and return resour
 Authorization uses custom policy classes invoked via an `authorizePolicy()` helper on the base Controller.
 
 **Agent Ticket Policy:**
-| Action | Rule |
-|--------|------|
-| `viewAny` | Must have an agent profile |
-| `view` | Any agent can view any ticket |
-| `update` | Only the assigned agent can update (status, priority, messages) |
+
+
+| Action    | Rule                                                            |
+| --------- | --------------------------------------------------------------- |
+| `viewAny` | Must have an agent profile                                      |
+| `view`    | Any agent can view any ticket                                   |
+| `update`  | Only the assigned agent can update (status, priority, messages) |
+
 
 **Client Ticket Policy:**
-| Action | Rule |
-|--------|------|
-| `viewAny` | Must have a client profile |
-| `view` | Can only view tickets from own organisation |
-| `create` | Must have a client profile |
+
+
+| Action    | Rule                                        |
+| --------- | ------------------------------------------- |
+| `viewAny` | Must have a client profile                  |
+| `view`    | Can only view tickets from own organisation |
+| `create`  | Must have a client profile                  |
+
 
 Clients are read-only on ticket fields — they can create tickets and send messages, but cannot change priority, status, or assignee. Only agents can modify ticket state.
 
 **Internal notes enforcement:** The `TicketMessageService::paginateForClient()` method filters `is_internal = false` at the query level, ensuring internal notes never reach client API responses regardless of what the frontend does.
 
-**Cross-role isolation:** Sanctum token abilities (`role:agent` / `role:client`) enforce that agent tokens cannot access client endpoints and vice versa. A client token hitting `/api/v1/agent/*` gets a 403.
+**Cross-role isolation:** Sanctum token abilities (`role:agent` / `role:client`) enforce that agent tokens cannot access client endpoints and vice versa. A client token hitting `/api/v1/agent/`* gets a 403.
 
 ### Response Envelope
 
@@ -144,22 +150,26 @@ All API responses use a consistent wrapper via `app/Utils/Response.php`:
 
 ### Priority Levels & Resolution Times
 
-| Priority | Resolution Time | Use Case |
-|----------|----------------|----------|
-| Low | 8 hours | Feature requests, general inquiries |
-| Medium | 6 hours | Non-critical bugs, configuration changes |
-| High | 4 hours | Service degradation, broken features |
-| Urgent | 2 hours | Service outages, security issues |
+
+| Priority | Resolution Time | Use Case                                 |
+| -------- | --------------- | ---------------------------------------- |
+| Low      | 8 hours         | Feature requests, general inquiries      |
+| Medium   | 6 hours         | Non-critical bugs, configuration changes |
+| High     | 4 hours         | Service degradation, broken features     |
+| Urgent   | 2 hours         | Service outages, security issues         |
+
 
 ### SLA Status Thresholds
 
 SLA status is derived from how much of the resolution time has been consumed:
 
-| SLA Status | Condition | Meaning |
-|------------|-----------|---------|
-| On Track | < 80% consumed | Plenty of time remaining |
-| Due Soon | 80% – 99% consumed | Approaching deadline |
-| Overdue | >= 100% consumed | Past SLA deadline |
+
+| SLA Status | Condition          | Meaning                  |
+| ---------- | ------------------ | ------------------------ |
+| On Track   | < 80% consumed     | Plenty of time remaining |
+| Due Soon   | 80% – 99% consumed | Approaching deadline     |
+| Overdue    | >= 100% consumed   | Past SLA deadline        |
+
 
 ### SLA Clock Behavior
 
@@ -206,16 +216,18 @@ LIMIT 1
 
 ## Ticket Filters (query params on list endpoints)
 
-| Filter | Agent | Client | Description |
-|--------|-------|--------|-------------|
-| `type` | `mine` / `all` | `mine` / `all` | My assigned/issued vs all |
-| `search` | Yes | Yes | Keyword search in title + message content |
-| `organization_id` | Yes | No | Filter by organisation |
-| `priority` | Yes | Yes | `low`, `medium`, `high`, `urgent` |
-| `status` | Yes | Yes | `open`, `on-hold`, `resolved`, `archived` |
-| `sla_status` | Yes | Yes | `on-track`, `due-soon`, `overdue` |
-| `started_from` / `started_to` | Yes | Yes | Date range on started_at |
-| `due_from` / `due_to` | Yes | Yes | Date range on due_at |
+
+| Filter                        | Agent          | Client         | Description                               |
+| ----------------------------- | -------------- | -------------- | ----------------------------------------- |
+| `type`                        | `mine` / `all` | `mine` / `all` | My assigned/issued vs all                 |
+| `search`                      | Yes            | Yes            | Keyword search in title + message content |
+| `organization_id`             | Yes            | No             | Filter by organisation                    |
+| `priority`                    | Yes            | Yes            | `low`, `medium`, `high`, `urgent`         |
+| `status`                      | Yes            | Yes            | `open`, `on-hold`, `resolved`, `archived` |
+| `sla_status`                  | Yes            | Yes            | `on-track`, `due-soon`, `overdue`         |
+| `started_from` / `started_to` | Yes            | Yes            | Date range on started_at                  |
+| `due_from` / `due_to`         | Yes            | Yes            | Date range on due_at                      |
+
 
 ## Testing
 
@@ -235,15 +247,17 @@ php artisan test --filter=SlaTimeGeneratorTest
 
 ### Test Coverage
 
-| Test File | What It Covers |
-|-----------|---------------|
-| `AgentTicketAuthorizationTest` | Agent can view any ticket with full relation data (assignee/issuer/org), can only update assigned tickets, agent sees internal notes in messages |
-| `ClientTicketAuthorizationTest` | Org-scoped visibility, priority and status endpoints return 404 for clients, internal notes are never exposed to clients |
-| `CrossRoleAccessTest` | Client token cannot access agent endpoints, agent token cannot access client endpoints, unauthenticated requests return 401 |
-| `UpdateTicketSlaStatusCommandTest` | SLA transitions (on-track → due-soon → overdue), `overdue_at` timestamping, on-hold/resolved/archived tickets skipped, no-op when unchanged |
-| `TicketSlaTest` | 22 | Ticket creation with SLA, auto-assignment load balancing, priority updates recalculate SLA, status transitions with pause/resume tracking |
-| `SlaTimeCalculatorTest` | Consumed time calculation, percentage with edge cases, status thresholds, due date with paused time |
-| `SlaTimeGeneratorTest` | Resolution time per priority level |
+
+| Test File                          | What It Covers                                                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AgentTicketAuthorizationTest`     | Agent can view any ticket with full relation data (assignee/issuer/org), can only update assigned tickets, agent sees internal notes in messages |
+| `ClientTicketAuthorizationTest`    | Org-scoped visibility, priority and status endpoints return 404 for clients, internal notes are never exposed to clients                         |
+| `CrossRoleAccessTest`              | Client token cannot access agent endpoints, agent token cannot access client endpoints, unauthenticated requests return 401                      |
+| `UpdateTicketSlaStatusCommandTest` | SLA transitions (on-track → due-soon → overdue), `overdue_at` timestamping, on-hold/resolved/archived tickets skipped, no-op when unchanged      |
+| `TicketSlaTest`                    | Ticket creation with SLA, auto-assignment load balancing, priority updates recalculate SLA, status transitions with pause/resume tracking                                                                                                                                               |
+| `SlaTimeCalculatorTest`            | Consumed time calculation, percentage with edge cases, status thresholds, due date with paused time                                              |
+| `SlaTimeGeneratorTest`             | Resolution time per priority level                                                                                                               |
+
 
 **Total: Around 60 tests and 120 assertions**
 
@@ -293,3 +307,4 @@ tests/
 ├── Feature/                   # Integration tests (auth, SLA, cross-role, command)
 └── Unit/                      # Unit tests (SLA generator)
 ```
+
