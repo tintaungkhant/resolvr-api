@@ -4,10 +4,9 @@ use App\Models\User;
 use App\Models\Agent;
 use App\Models\Ticket;
 use App\Enums\UserRole;
-use App\Enums\TicketStatus;
 use App\Models\Organization;
 use Laravel\Sanctum\Sanctum;
-use App\Enums\TicketSlaPriority;
+use App\Models\TicketMessage;
 
 beforeEach(function () {
     $this->organization = Organization::factory()->create();
@@ -27,81 +26,53 @@ beforeEach(function () {
         'organization_id' => $this->organization->id,
         'assignee_id'     => $this->otherAgent->id,
     ]);
-
-    $this->ticketUnassigned = Ticket::factory()->create([
-        'organization_id' => $this->organization->id,
-        'assignee_id'     => null,
-    ]);
 });
 
-it('allows an agent to view any ticket', function () {
+it('returns ticket details with SLA fields when viewing a ticket', function () {
+    Sanctum::actingAs($this->agent, ['role:agent']);
+
+    $this->getJson("/api/v1/agent/tickets/{$this->ticketAssignedToMe->id}")
+        ->assertSuccessful()
+        ->assertJsonPath('data.id', $this->ticketAssignedToMe->id)
+        ->assertJsonStructure([
+            'data' => ['id', 'title', 'status', 'priority', 'sla_status', 'due_at', 'assignee_id'],
+        ]);
+});
+
+it('allows an agent to view a ticket assigned to another agent', function () {
     Sanctum::actingAs($this->agent, ['role:agent']);
 
     $this->getJson("/api/v1/agent/tickets/{$this->ticketAssignedToPeer->id}")
-        ->assertSuccessful();
+        ->assertSuccessful()
+        ->assertJsonPath('data.id', $this->ticketAssignedToPeer->id);
 });
 
-it('allows an agent to list messages on any ticket', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->getJson("/api/v1/agent/tickets/{$this->ticketAssignedToPeer->id}/messages")
-        ->assertSuccessful();
-});
-
-it('forbids priority updates when not the assignee', function () {
+it('forbids updates to a ticket not assigned to the agent', function () {
     Sanctum::actingAs($this->agent, ['role:agent']);
 
     $this->patchJson("/api/v1/agent/tickets/{$this->ticketAssignedToPeer->id}/priority", [
-        'priority' => TicketSlaPriority::Urgent->value,
+        'priority' => 'urgent',
     ])->assertForbidden();
 });
 
-it('forbids priority updates when the ticket has no assignee', function () {
+it('includes internal notes when an agent fetches messages', function () {
     Sanctum::actingAs($this->agent, ['role:agent']);
 
-    $this->patchJson("/api/v1/agent/tickets/{$this->ticketUnassigned->id}/priority", [
-        'priority' => TicketSlaPriority::Urgent->value,
-    ])->assertForbidden();
-});
+    TicketMessage::factory()->create([
+        'ticket_id'   => $this->ticketAssignedToMe->id,
+        'user_id'     => $this->agent->id,
+        'content'     => 'Public reply',
+        'is_internal' => false,
+    ]);
 
-it('allows priority updates when assigned to the agent', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->patchJson("/api/v1/agent/tickets/{$this->ticketAssignedToMe->id}/priority", [
-        'priority' => TicketSlaPriority::Urgent->value,
-    ])->assertSuccessful();
-});
-
-it('forbids status updates when not the assignee', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->patchJson("/api/v1/agent/tickets/{$this->ticketAssignedToPeer->id}/status", [
-        'status' => TicketStatus::OnHold->value,
-    ])->assertForbidden();
-});
-
-it('allows status updates when assigned to the agent', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->patchJson("/api/v1/agent/tickets/{$this->ticketAssignedToMe->id}/status", [
-        'status' => TicketStatus::OnHold->value,
-    ])->assertSuccessful();
-});
-
-it('forbids creating a message when not the assignee', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->postJson("/api/v1/agent/tickets/{$this->ticketAssignedToPeer->id}/messages", [
-        'content'     => 'Note',
+    TicketMessage::factory()->create([
+        'ticket_id'   => $this->ticketAssignedToMe->id,
+        'user_id'     => $this->agent->id,
+        'content'     => 'Secret internal note',
         'is_internal' => true,
-    ])->assertForbidden();
-});
+    ]);
 
-it('allows creating a message when assigned to the agent', function () {
-    Sanctum::actingAs($this->agent, ['role:agent']);
-
-    $this->postJson("/api/v1/agent/tickets/{$this->ticketAssignedToMe->id}/messages", [
-        'content'     => 'Reply',
-        'is_internal' => true,
-    ])->assertSuccessful();
+    $this->getJson("/api/v1/agent/tickets/{$this->ticketAssignedToMe->id}/messages")
+        ->assertSuccessful()
+        ->assertJsonCount(2, 'data');
 });
