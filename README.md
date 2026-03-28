@@ -204,40 +204,7 @@ ORDER BY active_count ASC, agents.user_id ASC
 LIMIT 1
 ```
 
-## API Endpoints
-
-### Agent Panel
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| `POST` | `/api/v1/agent/login` | Login with email + password |
-| `GET` | `/api/v1/agent/profile` | Get authenticated agent's profile |
-| `GET` | `/api/v1/agent/agents` | List all agents (for assignee dropdown) |
-| `GET` | `/api/v1/agent/organizations` | List all organisations (for filter dropdown) |
-| `GET` | `/api/v1/agent/tickets` | List tickets (filterable, eager loads assignee/issuer/org) |
-| `GET` | `/api/v1/agent/tickets/{id}` | View ticket with assignee, issuer, and organisation details |
-| `PATCH` | `/api/v1/agent/tickets/{id}/priority` | Update priority (recalculates SLA) |
-| `PATCH` | `/api/v1/agent/tickets/{id}/status` | Update status (manages SLA pause/resume) |
-| `PATCH` | `/api/v1/agent/tickets/{id}/assignee` | Reassign ticket to another agent |
-| `GET` | `/api/v1/agent/tickets/{id}/messages` | List messages (includes internal notes) |
-| `POST` | `/api/v1/agent/tickets/{id}/messages` | Send message (with optional `is_internal` flag) |
-
-### Client Panel
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| `POST` | `/api/v1/client/login` | Login with email + password |
-| `GET` | `/api/v1/client/profile` | Get authenticated client's profile |
-| `GET` | `/api/v1/client/agents` | List agents (for displaying assignee names) |
-| `GET` | `/api/v1/client/tickets` | List own/organisation tickets (filterable, eager loads assignee) |
-| `POST` | `/api/v1/client/tickets` | Create a new ticket |
-| `GET` | `/api/v1/client/tickets/{id}` | View ticket with assignee details |
-| `GET` | `/api/v1/client/tickets/{id}/messages` | List messages (internal notes excluded) |
-| `POST` | `/api/v1/client/tickets/{id}/messages` | Send message (always public) |
-
-Clients cannot update priority, status, or assignee — those endpoints do not exist on the client panel.
-
-### Ticket Filters (query params on list endpoints)
+## Ticket Filters (query params on list endpoints)
 
 | Filter | Agent | Client | Description |
 |--------|-------|--------|-------------|
@@ -268,17 +235,17 @@ php artisan test --filter=SlaTimeGeneratorTest
 
 ### Test Coverage
 
-| Test File | Tests | What It Covers |
-|-----------|-------|---------------|
-| `AgentTicketAuthorizationTest` | 4 | Agent can view any ticket with full relation data (assignee/issuer/org), can only update assigned tickets, agent sees internal notes in messages |
-| `ClientTicketAuthorizationTest` | 4 | Org-scoped visibility, priority and status endpoints return 404 for clients, internal notes are never exposed to clients |
-| `CrossRoleAccessTest` | 3 | Client token cannot access agent endpoints, agent token cannot access client endpoints, unauthenticated requests return 401 |
-| `UpdateTicketSlaStatusCommandTest` | 5 | SLA transitions (on-track → due-soon → overdue), `overdue_at` timestamping, on-hold/resolved/archived tickets skipped, no-op when unchanged |
+| Test File | What It Covers |
+|-----------|---------------|
+| `AgentTicketAuthorizationTest` | Agent can view any ticket with full relation data (assignee/issuer/org), can only update assigned tickets, agent sees internal notes in messages |
+| `ClientTicketAuthorizationTest` | Org-scoped visibility, priority and status endpoints return 404 for clients, internal notes are never exposed to clients |
+| `CrossRoleAccessTest` | Client token cannot access agent endpoints, agent token cannot access client endpoints, unauthenticated requests return 401 |
+| `UpdateTicketSlaStatusCommandTest` | SLA transitions (on-track → due-soon → overdue), `overdue_at` timestamping, on-hold/resolved/archived tickets skipped, no-op when unchanged |
 | `TicketSlaTest` | 22 | Ticket creation with SLA, auto-assignment load balancing, priority updates recalculate SLA, status transitions with pause/resume tracking |
-| `SlaTimeCalculatorTest` | 13 | Consumed time calculation, percentage with edge cases, status thresholds, due date with paused time |
-| `SlaTimeGeneratorTest` | 5 | Resolution time per priority level |
+| `SlaTimeCalculatorTest` | Consumed time calculation, percentage with edge cases, status thresholds, due date with paused time |
+| `SlaTimeGeneratorTest` | Resolution time per priority level |
 
-**Total: 56 tests, 123 assertions**
+**Total: Around 60 tests and 120 assertions**
 
 Tests focus on the areas that matter most: SLA correctness, authorization boundaries, internal note visibility, and cross-role isolation. Response body assertions verify data shape and content, not just HTTP status codes.
 
