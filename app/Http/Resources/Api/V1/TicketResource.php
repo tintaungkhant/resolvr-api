@@ -33,6 +33,18 @@ class TicketResource extends JsonResource
             'last_sla_paused_at'  => $this->resource->last_sla_paused_at,
             'updated_at'          => $this->resource->updated_at,
             'created_at'          => $this->resource->created_at,
+            'assignee'            => $this->whenLoaded(
+                'assignee',
+                fn () => UserResource::make($this->resource->assignee)
+            ),
+            'issuer'              => $this->whenLoaded(
+                'issuer',
+                fn () => UserResource::make($this->resource->issuer)
+            ),
+            'organization'        => $this->whenLoaded(
+                'organization',
+                fn () => OrganizationResource::make($this->resource->organization)
+            ),
         ];
     }
 }

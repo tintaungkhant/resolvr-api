@@ -22,7 +22,7 @@ class TicketService
      */
     public function paginateForAgent(User $user, string $type, array $filters = []): LengthAwarePaginator
     {
-        $query = Ticket::query();
+        $query = Ticket::query()->with(['assignee', 'issuer', 'organization']);
 
         if ($type === 'mine') {
             $query->where('assignee_id', $user->id);
