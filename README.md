@@ -9,7 +9,7 @@ A support ticket portal built with Laravel 13 where customer organisations submi
 - **Backend:** Laravel 13, PHP 8.4
 - **Authentication:** Laravel Sanctum v4 (token-based)
 - **Database:** MySQL/MariaDB
-- **Frontend:** SvelteKit (separate project — `[resolvr-frontend](https://github.com/tintaungkhant/resolvr-frontend)`)
+- **Frontend:** SvelteKit (separate project — [`resolvr-frontend`](https://github.com/tintaungkhant/resolvr-frontend))
 - **Testing:** Pest v4
 - **Code Quality:** Larastan (PHPStan), Laravel Pint
 
