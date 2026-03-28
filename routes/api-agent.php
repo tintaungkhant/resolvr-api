@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Agent\AuthController;
 use App\Http\Controllers\Api\V1\Agent\AgentController;
 use App\Http\Controllers\Api\V1\Agent\TicketController;
 use App\Http\Controllers\Api\V1\Agent\ProfileController;
+use App\Http\Controllers\Api\V1\Agent\OrganizationController;
 use App\Http\Controllers\Api\V1\Agent\TicketMessageController;
 
 Route::prefix('v1')->group(function () {
@@ -15,6 +16,7 @@ Route::prefix('v1')->group(function () {
             Route::get('profile', [ProfileController::class, 'show']);
 
             Route::get('agents', [AgentController::class, 'index']);
+            Route::get('organizations', [OrganizationController::class, 'index']);
 
             Route::get('tickets', [TicketController::class, 'index']);
             Route::get('tickets/{ticket}', [TicketController::class, 'show']);

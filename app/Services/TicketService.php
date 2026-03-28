@@ -10,35 +10,43 @@ use App\Utils\SlaTimeGenerator;
 use App\Enums\TicketSlaPriority;
 use App\Utils\SlaTimeCalculator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TicketService
 {
     /**
+     * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Ticket>
      */
-    public function paginateForAgent(User $user, string $type): LengthAwarePaginator
+    public function paginateForAgent(User $user, string $type, array $filters = []): LengthAwarePaginator
     {
+        $query = Ticket::query();
+
         if ($type === 'mine') {
-            return Ticket::where('assignee_id', $user->id)->latest('id')->paginate();
+            $query->where('assignee_id', $user->id);
         }
 
-        return Ticket::latest('id')->paginate();
+        return $this->applyFilters($query, $filters)->latest('id')->paginate();
     }
 
     /**
+     * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Ticket>
      */
-    public function paginateForClient(User $user, string $type): LengthAwarePaginator
+    public function paginateForClient(User $user, string $type, array $filters = []): LengthAwarePaginator
     {
+        $query = Ticket::query();
+
         if ($type === 'mine') {
-            return Ticket::where('issuer_id', $user->id)->latest('id')->paginate();
+            $query->where('issuer_id', $user->id);
+        } else {
+            $client = $user->client;
+            $query->where('organization_id', $client?->organization_id);
         }
 
-        $client = $user->client;
-
-        return Ticket::where('organization_id', $client?->organization_id)->latest('id')->paginate();
+        return $this->applyFilters($query, $filters)->latest('id')->paginate();
     }
 
     public function createForClient(User $user, string $title, string $description, TicketSlaPriority $priority): Ticket
@@ -126,6 +134,58 @@ class TicketService
         ]);
 
         return $ticket;
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Ticket>
+     */
+    private function applyFilters(Builder $query, array $filters): Builder
+    {
+        if (! empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('messages', function ($mq) use ($search) {
+                        $mq->where('content', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if (! empty($filters['organization_id'])) {
+            $query->where('organization_id', $filters['organization_id']);
+        }
+
+        if (! empty($filters['priority'])) {
+            $query->where('priority', $filters['priority']);
+        }
+
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (! empty($filters['sla_status'])) {
+            $query->where('sla_status', $filters['sla_status']);
+        }
+
+        if (! empty($filters['started_from'])) {
+            $query->whereDate('started_at', '>=', $filters['started_from']);
+        }
+
+        if (! empty($filters['started_to'])) {
+            $query->whereDate('started_at', '<=', $filters['started_to']);
+        }
+
+        if (! empty($filters['due_from'])) {
+            $query->whereDate('due_at', '>=', $filters['due_from']);
+        }
+
+        if (! empty($filters['due_to'])) {
+            $query->whereDate('due_at', '<=', $filters['due_to']);
+        }
+
+        return $query;
     }
 
     private function resolveAssigneeUserId(): ?int

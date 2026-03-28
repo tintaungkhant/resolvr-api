@@ -26,7 +26,11 @@ class TicketController extends Controller
         $user = $this->authUser();
 
         $type = $request->query('type', 'mine');
-        $tickets = $this->ticketService->paginateForClient($user, $type);
+        $filters = $request->only([
+            'search', 'priority', 'status', 'sla_status',
+            'started_from', 'started_to', 'due_from', 'due_to',
+        ]);
+        $tickets = $this->ticketService->paginateForClient($user, $type, $filters);
 
         return successResponse(TicketResource::collection($tickets));
     }
