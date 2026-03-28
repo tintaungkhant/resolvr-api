@@ -144,9 +144,9 @@ class TicketService
         if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+                $q->whereLike('title', "%{$search}%")
                     ->orWhereHas('messages', function ($mq) use ($search) {
-                        $mq->where('content', 'like', "%{$search}%");
+                        $mq->whereLike('content', "%{$search}%");
                     });
             });
         }
