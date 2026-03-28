@@ -53,8 +53,12 @@ it('returns ticket details for a client in the same organization', function () {
         ]);
 });
 
-it('does not expose a status update endpoint for clients', function () {
+it('does not expose priority or status update endpoints for clients', function () {
     Sanctum::actingAs($this->issuer, ['role:client']);
+
+    $this->patchJson("/api/v1/client/tickets/{$this->ticket->id}/priority", [
+        'priority' => 'urgent',
+    ])->assertNotFound();
 
     $this->patchJson("/api/v1/client/tickets/{$this->ticket->id}/status", [
         'status' => 'on-hold',

@@ -21,9 +21,4 @@ class TicketPolicy
     {
         return $user->client()->exists();
     }
-
-    public function update(User $user, Ticket $ticket): bool
-    {
-        return $this->view($user, $ticket) && $user->id === $ticket->issuer_id;
-    }
 }

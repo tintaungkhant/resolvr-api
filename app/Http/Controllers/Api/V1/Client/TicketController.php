@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\TicketResource;
 use App\Http\Requests\Api\V1\Client\TicketStoreRequest;
-use App\Http\Requests\Api\V1\TicketPriorityUpdateRequest;
 use App\Policies\Client\TicketPolicy as ClientTicketPolicy;
 
 class TicketController extends Controller
@@ -53,15 +52,6 @@ class TicketController extends Controller
     public function show(Ticket $ticket): JsonResponse
     {
         $this->authorizePolicy(ClientTicketPolicy::class, 'view', $ticket);
-
-        return successResponse(TicketResource::make($ticket));
-    }
-
-    public function updatePriority(Ticket $ticket, TicketPriorityUpdateRequest $request): JsonResponse
-    {
-        $this->authorizePolicy(ClientTicketPolicy::class, 'update', $ticket);
-
-        $this->ticketService->updatePriority($ticket, $request->ticketSlaPriority());
 
         return successResponse(TicketResource::make($ticket));
     }
