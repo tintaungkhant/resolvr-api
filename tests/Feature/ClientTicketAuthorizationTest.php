@@ -4,7 +4,6 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\Ticket;
 use App\Enums\UserRole;
-use App\Enums\TicketStatus;
 use App\Models\Organization;
 use Laravel\Sanctum\Sanctum;
 use App\Enums\TicketSlaPriority;
