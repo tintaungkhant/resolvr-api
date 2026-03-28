@@ -2,6 +2,8 @@
 
 A support ticket portal built with Laravel 13 where customer organisations submit and manage support tickets, and a support team handles them.
 
+> **[Project Report (REPORT.md)](REPORT.md)** — Implementation steps, design decisions, timeline, and what's next.
+
 ## Tech Stack
 
 - **Backend:** Laravel 13, PHP 8.4
