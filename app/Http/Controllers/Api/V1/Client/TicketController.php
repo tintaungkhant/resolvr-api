@@ -53,6 +53,8 @@ class TicketController extends Controller
     {
         $this->authorizePolicy(ClientTicketPolicy::class, 'view', $ticket);
 
+        $ticket->load(['assignee.agent']);
+
         return successResponse(TicketResource::make($ticket));
     }
 }

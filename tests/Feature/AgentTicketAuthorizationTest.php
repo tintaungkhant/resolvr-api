@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Agent;
+use App\Models\Client;
 use App\Models\Ticket;
 use App\Enums\UserRole;
 use App\Models\Organization;
@@ -17,13 +18,21 @@ beforeEach(function () {
     $this->otherAgent = User::factory()->create(['role' => UserRole::Agent]);
     Agent::factory()->create(['user_id' => $this->otherAgent->id]);
 
+    $issuer = User::factory()->create(['role' => UserRole::Client]);
+    Client::factory()->create([
+        'user_id'         => $issuer->id,
+        'organization_id' => $this->organization->id,
+    ]);
+
     $this->ticketAssignedToMe = Ticket::factory()->create([
         'organization_id' => $this->organization->id,
+        'issuer_id'       => $issuer->id,
         'assignee_id'     => $this->agent->id,
     ]);
 
     $this->ticketAssignedToPeer = Ticket::factory()->create([
         'organization_id' => $this->organization->id,
+        'issuer_id'       => $issuer->id,
         'assignee_id'     => $this->otherAgent->id,
     ]);
 });
@@ -35,7 +44,12 @@ it('returns ticket details with SLA fields when viewing a ticket', function () {
         ->assertSuccessful()
         ->assertJsonPath('data.id', $this->ticketAssignedToMe->id)
         ->assertJsonStructure([
-            'data' => ['id', 'title', 'status', 'priority', 'sla_status', 'due_at', 'assignee_id'],
+            'data' => [
+                'id', 'title', 'status', 'priority', 'sla_status', 'due_at', 'assignee_id',
+                'assignee'     => ['name'],
+                'issuer'       => ['name'],
+                'organization' => ['name'],
+            ],
         ]);
 });
 
