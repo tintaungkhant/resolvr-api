@@ -62,6 +62,10 @@ class TicketMessageService
         return $message;
     }
 
+    /**
+     * @param  HasMany<TicketMessage, Ticket>  $relation
+     * @return LengthAwarePaginator<int, TicketMessage>
+     */
     private function paginateLatestReversed(HasMany $relation): LengthAwarePaginator
     {
         $paginator = $relation->latest('id')->paginate();

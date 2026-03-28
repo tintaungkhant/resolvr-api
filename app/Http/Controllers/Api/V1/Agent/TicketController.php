@@ -23,7 +23,7 @@ class TicketController extends Controller
     {
         $this->authorizePolicy(AgentTicketPolicy::class, 'viewAny');
 
-        $user = $request->user();
+        $user = $this->authUser();
 
         $type = $request->query('type', 'mine');
         $tickets = $this->ticketService->paginateForAgent($user, $type);

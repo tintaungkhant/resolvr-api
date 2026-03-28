@@ -29,7 +29,7 @@ class TicketMessageController extends Controller
     {
         $this->authorizePolicy(AgentTicketPolicy::class, 'update', $ticket);
 
-        $user = $request->user();
+        $user = $this->authUser();
 
         $message = $this->ticketMessageService->storeForAgent(
             $ticket,

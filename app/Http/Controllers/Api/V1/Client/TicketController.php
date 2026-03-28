@@ -23,7 +23,7 @@ class TicketController extends Controller
     {
         $this->authorizePolicy(ClientTicketPolicy::class, 'viewAny');
 
-        $user = $request->user();
+        $user = $this->authUser();
 
         $type = $request->query('type', 'mine');
         $tickets = $this->ticketService->paginateForClient($user, $type);
@@ -35,7 +35,7 @@ class TicketController extends Controller
     {
         $this->authorizePolicy(ClientTicketPolicy::class, 'create');
 
-        $user = $request->user();
+        $user = $this->authUser();
 
         $ticket = $this->ticketService->createForClient(
             $user,

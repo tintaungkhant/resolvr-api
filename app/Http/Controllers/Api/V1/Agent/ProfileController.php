@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1\Agent;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\AgentProfileService;
@@ -14,9 +13,9 @@ class ProfileController extends Controller
         private AgentProfileService $agentProfileService,
     ) {}
 
-    public function show(Request $request): JsonResponse
+    public function show(): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->authUser();
 
         $profile = $this->agentProfileService->forUser($user);
 

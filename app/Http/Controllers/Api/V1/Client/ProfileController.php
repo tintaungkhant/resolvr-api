@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\ClientProfileService;
@@ -14,9 +13,9 @@ class ProfileController extends Controller
         private ClientProfileService $clientProfileService,
     ) {}
 
-    public function show(Request $request): JsonResponse
+    public function show(): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->authUser();
 
         $profile = $this->clientProfileService->forUser($user);
 
