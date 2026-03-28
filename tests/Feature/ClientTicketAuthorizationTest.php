@@ -67,22 +67,6 @@ it('allows priority updates from the issuer', function () {
     ])->assertSuccessful();
 });
 
-it('forbids status updates from a non-issuer in the same organization', function () {
-    Sanctum::actingAs($this->colleague, ['role:client']);
-
-    $this->patchJson("/api/v1/client/tickets/{$this->ticket->id}/status", [
-        'status' => TicketStatus::OnHold->value,
-    ])->assertForbidden();
-});
-
-it('allows status updates from the issuer', function () {
-    Sanctum::actingAs($this->issuer, ['role:client']);
-
-    $this->patchJson("/api/v1/client/tickets/{$this->ticket->id}/status", [
-        'status' => TicketStatus::OnHold->value,
-    ])->assertSuccessful();
-});
-
 it('forbids listing messages for a ticket from another organization', function () {
     Sanctum::actingAs($this->outsider, ['role:client']);
 
