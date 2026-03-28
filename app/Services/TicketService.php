@@ -80,6 +80,8 @@ class TicketService
 
     public function updatePriority(Ticket $ticket, TicketSlaPriority $priority): Ticket
     {
+        $this->validateIfUpdatable($ticket);
+
         $lastPriority = $ticket->priority;
 
         $ticket->update([
@@ -99,11 +101,7 @@ class TicketService
 
     public function updateStatus(Ticket $ticket, TicketStatus $status): Ticket
     {
-        if (! in_array($ticket->status, [TicketStatus::Open, TicketStatus::OnHold], true)) {
-            throw ValidationException::withMessages([
-                'status' => ['Only open or on-hold tickets can be updated'],
-            ]);
-        }
+        $this->validateIfUpdatable($ticket);
 
         $lastStatus = $ticket->status;
 
@@ -205,5 +203,14 @@ class TicketService
             ->orderByRaw('COALESCE(ticket_counts.active_count, 0) asc')
             ->orderBy('agents.user_id')
             ->value('agents.user_id');
+    }
+
+    private function validateIfUpdatable(Ticket $ticket): void
+    {
+        if (! in_array($ticket->status, [TicketStatus::Open, TicketStatus::OnHold], true)) {
+            throw ValidationException::withMessages([
+                'status' => ['Only open or on-hold tickets can be updated'],
+            ]);
+        }
     }
 }
